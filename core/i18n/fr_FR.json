@@ -1,0 +1,33 @@
+{
+    "plugins\/pollenwatcher\/desktop\/php\/pollenwatcher.php": {
+        "Gestion": "Gestion",
+        "Ajouter": "Ajouter",
+        "Configuration": "Configuration",
+        "Mes Bulletins": "Mes Bulletins",
+        "Sauvegarder": "Sauvegarder",
+        "Supprimer": "Supprimer",
+        "Configuration avancée": "Configuration avancée",
+        "Equipement": "Equipement",
+        "Commandes": "Commandes",
+        "Objet parent": "Objet parent",
+        "Aucun": "Aucun",
+        "Catégorie": "Catégorie",
+        "Activer": "Activer",
+        "Visible": "Visible",
+        "Region": "Region",
+        "Nom": "Nom",
+        "Type": "Type",
+        "Action": "Action",
+        "Surveillance Allergo Pollinique": "Surveillance Allergo Pollinique",
+        "Style affichage valeur globale": "Style affichage valeur globale",
+        "Nom de l'équipement template": "Nom de l'équipement template"
+    },
+    "plugins\/pollenwatcher\/desktop\/js\/pollenwatcher.js": {
+        "Nom": "Nom",
+        "Afficher": "Afficher",
+        "Tester": "Tester"
+    },
+    "plugins\/pollenwatcher\/core\/class\/pollenwatcher.class.php": {
+        "Veuillez selectionner une région": "Veuillez selectionner une région"
+    }
+}
