@@ -3,7 +3,7 @@
 	"name" : "Surveillance Allergo Pollinique",
 	"licence" : "AGPL",
 	"author" : "Gr3g0rY",
-	"require" : "0.1",
+	"require" : "3.0",
 	"category" : "weather",
 	"hasDependency" : 0,
 	"hasOwnDeamon" : 0
