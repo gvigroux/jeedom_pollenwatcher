@@ -95,7 +95,7 @@ class pollenwatcher extends eqLogic {
 		$command->save();
 		
 		// Max Value info		
-		$this->createPollenInfo("max_value", "Valeur Maximale", False);
+		$this->createPollenInfo("max_value", "Valeur Maximale", True);
 				
     }
 
