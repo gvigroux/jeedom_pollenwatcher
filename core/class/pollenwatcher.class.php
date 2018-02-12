@@ -100,7 +100,7 @@ class pollenwatcher extends eqLogic {
     }
 
 	
-    public function preUpdate() {          
+    public function preUpdate() {
 		if ($this->getConfiguration('region_id') == '') {
 			throw new Exception(__('Veuillez selectionner une région', __FILE__));
 		}
@@ -253,11 +253,12 @@ class pollenwatcher extends eqLogic {
 		
 		$data = '';	
 		for ($i=5; $i>0; $i--) {
+			if(!array_key_exists($i, $ordererArray) )
+				continue;
 			foreach($ordererArray[$i] as $key) {
 				if(strlen($data)>0)
 					$data .=  "<br/>";
 				$data .= "<span><i class='fa fa-circle' style='font-size : 1em;color:". $this->getAllergyColor($i) . "'></i>&nbsp;&nbsp;" . $key . "</span>";
-				
 			}
 		}		
 		$replace["#data#"] 		= $data;
@@ -265,15 +266,21 @@ class pollenwatcher extends eqLogic {
 		// *********************************
 		//  Prepare global level (update CMD if needed)
 		
-		$status = $this->getCmd(null, 'max_value');		
-		if( $maxLevel != $status->execCmd() ) 
+		$status = $this->getCmd(null, 'max_value');
+		if (  is_object($status ) && ( $maxLevel != $status->execCmd() ) && ($status->getIsVisible() == 1))
 		{
 			$status->setValue(maxLevel);
-			$status->save();			
+			$status->save();
+			$replace["#global_color#"]	= $this->getAllergyColor($maxLevel);
+			$replace["#global_level#"]	= $maxLevel;	
+		}
+		else if ( !is_object($status ) || ($status->getIsVisible() == 0))
+		{
+			$replace["#global_color#"]	= '';
+			$replace["#global_level#"]	= '';
+			$replace["#global_style#"]	= '';
 		}
 		
-		$replace["#global_color#"]	= $this->getAllergyColor($maxLevel);
-		$replace["#global_level#"]	= $maxLevel;
 		
 		return $this->postToHtml($_version, template_replace($replace, getTemplate('core', $version, 'main', 'pollenwatcher')));
     }
