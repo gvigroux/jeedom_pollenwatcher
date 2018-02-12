@@ -267,14 +267,16 @@ class pollenwatcher extends eqLogic {
 		//  Prepare global level (update CMD if needed)
 		
 		$status = $this->getCmd(null, 'max_value');
-		if (  is_object($status ) && ( $maxLevel != $status->execCmd() ) && ($status->getIsVisible() == 1))
+		if (  is_object($status ) && ($status->getIsVisible() == 1))
 		{
-			$status->setValue(maxLevel);
-			$status->save();
+			if( $maxLevel != $status->execCmd()  ) {
+				$status->setValue(maxLevel);
+				$status->save();
+			}
 			$replace["#global_color#"]	= $this->getAllergyColor($maxLevel);
-			$replace["#global_level#"]	= $maxLevel;	
+			$replace["#global_level#"]	= $maxLevel;
 		}
-		else if ( !is_object($status ) || ($status->getIsVisible() == 0))
+		else
 		{
 			$replace["#global_color#"]	= '';
 			$replace["#global_level#"]	= '';
