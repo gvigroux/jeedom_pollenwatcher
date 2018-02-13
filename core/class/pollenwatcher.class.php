@@ -83,9 +83,12 @@ class pollenwatcher extends eqLogic {
 			$this->createPollenInfo($key, $key);
 		}
 		
+		// Max Value info		
+		$this->createPollenInfo("max_value", "Valeur Maximale", True);
+		
 		// Refresh command		
 		$command = pollenwatcherCmd::byEqLogicIdAndLogicalId($this->getId(), "refresh");
-		if(!is_object($info))
+		if(!is_object($command))
 			$command = new pollenwatcherCmd();
 		$command->setName("Rafraichir");
 		$command->setLogicalId("refresh");
@@ -93,10 +96,6 @@ class pollenwatcher extends eqLogic {
 		$command->setType("action");
 		$command->setSubType("other");
 		$command->save();
-		
-		// Max Value info		
-		$this->createPollenInfo("max_value", "Valeur Maximale", True);
-				
     }
 
 	
@@ -120,7 +119,6 @@ class pollenwatcher extends eqLogic {
 		if( strlen($value) <= 0 ) 
 			$this->updateData();
     }
-	
 	
 	
 	private function createPollenInfo($logicalId, $name, $visibility = True) {	
