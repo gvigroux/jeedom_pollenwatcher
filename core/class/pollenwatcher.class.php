@@ -26,25 +26,25 @@ class pollenwatcher extends eqLogic {
 	
 	public static function getPollens(){
 		return array(
-			"Cupressacées",
-			"Noisetier",
-			"Aulne",
-			"Peuplier",
+			"Cyprès",
 			"Saule",
 			"Frêne",
+			"Peuplier",
 			"Charme",
 			"Bouleau",
 			"Platane",
 			"Chêne",
-			"Olivier",
-			"Tilleul",
-			"Châtaignier",
-			"Rumex",
 			"Graminées",
-			"Plantain",
+			"Oseille",
 			"Urticacées",
+			"Châtaignier",
 			"Armoises",
-			"Ambroisies"
+			"Aulne",
+			"Noisetier",
+			"Plantain",
+			"Olivier",
+			"Ambroisies",
+			"Tilleul"
 		);
 	}
 	
@@ -140,55 +140,60 @@ class pollenwatcher extends eqLogic {
 		if( $visibility == False )
 			$info->setIsVisible(False);			
 		$info->save();	
-	}
-	
+	}	
 	
 	public function updateData()
 	{		
-		$url = 'http://internationalragweedsociety.org/vigilance/d%20' . sprintf("%02d",$this->getConfiguration("region_id")) . '.gif';
-		$image = imagecreatefromgif($url);
-		if(!$image) 
-		{
-			log::add('pollenwatcher','error','Unable to get pollen info in region: ' . $this->getConfiguration("region_id") . ' with URL [' . $url . ']');
-			return;
-		}		
 		
-		// 1: Array ( [red] => 0 [green] => 255 [blue] => 0 [alpha] => 0 ) 
-		// 2: Array ( [red] => 0 [green] => 176 [blue] => 80 [alpha] => 0 ) 
-		// 3: Array ( [red] => 255 [green] => 255 [blue] => 0 [alpha] => 0 ) 
-		// 4: Array ( [red] => 247 [green] => 150 [blue] => 70 [alpha] => 0 ) 
-		// 5: Array ( [red] => 255 [green] => 0 [blue] => 0 [alpha] => 0 ) 
+		# Use the Curl extension to get details
+		$url = 'https://pollens.fr/risks/thea/counties/' . sprintf("%02d",$this->getConfiguration("region_id"));
+		$ch = curl_init();
+		$timeout = 5;
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+		$html = curl_exec($ch);
+		curl_close($ch);
+		
+		# Create a DOM parser object
+		$dom = new DOMDocument();
 
-		$y = 46;
-		$changed = false;
-		foreach ($this->getPollens() as $key){
-			$rgb 	= imagecolorat($image, 126, $y );
-			$array 	= imagecolorsforindex($image, $rgb);
-			
-			$y += 20;
-			$value = 0;
-			if( $array[red] == 0 && $array[green] == 255 )
-				$value = 1;
-			else if( $array[red] == 0 && $array[green] == 176 )
-				$value = 2;
-			else if( $array[red] == 255 && $array[green] == 255 )
-				$value = 3;
-			else if( $array[red] == 247 )
-				$value = 4;
-			else if( $array[red] == 255 && $array[green] == 0 )
-				$value = 5;
-			
-			// Update Info command
-			$changed = $this->checkAndUpdateCmd($key, $value ) || $changed;		
-		}	
+		# Parse the HTML
+		# The @ before the method call suppresses any warnings that
+		# loadHTML might throw because of invalid HTML in the page.
+		@$dom->loadHTML($html);
 		
-		$changed = $this->updateMaxValue() || $changed;
-	
+		# Iterate over all the <rect> tags
+		$index = 0;
+		$changed = false;
+		foreach($dom->getElementsByTagName('rect') as $link) {
+				$value = 0;
+				$width = $link->getAttribute('width');
+				if( $width > 0 && $width <= 30)
+					$value = 1;
+				else if( $width > 30 && $width <= 60)
+					$value = 2;
+				else if( $width > 60 && $width <= 90)
+					$value = 3;
+				else if( $width > 90 && $width <= 140)
+					$value = 4;
+				else if( $width > 140 )
+					$value = 5;
+				# Show the <rect width>
+				//echo $this->getPollens()[$index] . ' ' . $link->getAttribute('width') . ' ' . $value . "<br />";
+				// Update Info command
+				$changed = $this->checkAndUpdateCmd($this->getPollens()[$index], $value ) || $changed;		
+				$index += 1;
+		}
+
+		$changed = $this->updateMaxValue() || $changed;			
 		log::add('pollenwatcher', 'info', "Data updated for Region: " . $this->getConfiguration("region_id"));
 		
 		if ($changed)
-			$this->refreshWidget();		
+			$this->refreshWidget();	
 	}
+	
+	
 	
 	// *****************************************
 	// Update the Max Value Command
